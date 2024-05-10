@@ -1,26 +1,29 @@
 //import liraries
-import React, {Component, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
 import {AppColors} from '../../theme/appColors';
-import {AddCircle, Map, NoteAdd, Notepad2} from 'iconsax-react-native';
+import {ArrowCircleRight2, Map} from 'iconsax-react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import FlatActionButton from '../../components/ui/flatActionButton';
-import {ADDNOTE, NOTELIST} from '../../utils/routes';
-import {notes} from '../../utils/mockData';
+import {ADDNOTE} from '../../utils/routes';
 import CustomMarker from '../../components/maps/customMarker';
 
 // create a component
-const Home = props => {
+const SelectCoordinate = props => {
   const {navigation} = props;
   const [mapTypes, setMapTypes] = useState('standart');
-
+  const [coordinate, setCordinate] = useState(null);
   const changeMapType = () => {
     if (mapTypes == 'standart') {
       setMapTypes('hybrid');
     } else {
       setMapTypes('standart');
     }
+  };
+  console.log(coordinate);
+  const handleMarkerPress = e => {
+    const {coordinate} = e?.nativeEvent;
+    setCordinate(coordinate);
   };
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -54,16 +57,40 @@ const Home = props => {
             color={mapTypes == 'standart' ? AppColors.BLACK : AppColors.WHITE}
           />
         </TouchableOpacity>
+
+        <MapView
+          provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+          style={styles.map}
+          mapType={mapTypes} // haritanın tipi
+          initialRegion={{
+            latitude: 41.0541648,
+            longitude: 28.9764438,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          onPress={handleMarkerPress}
+          region={{
+            latitude: 41.023845,
+            longitude: 29.1983273,
+            latitudeDelta: 0.0922, // Küçük değerler daha fazla zoom yapar
+            longitudeDelta: 0.0421, // Küçük değerler daha fazla zoom yapar
+          }}>
+          {coordinate && <Marker coordinate={coordinate} />}
+        </MapView>
         <TouchableOpacity
-          onPress={() => navigation.navigate(NOTELIST)}
+          onPress={() =>
+            !coordinate
+              ? null
+              : navigation.navigate(ADDNOTE, {coordinate: coordinate})
+          }
           style={{
             width: 70,
             height: 70,
             position: 'absolute',
-            top: 20,
+            bottom: 20,
             right: 15,
             zIndex: 100,
-            backgroundColor: AppColors.WHITE,
+            backgroundColor: !coordinate ? AppColors.GRAY : AppColors.GREEN,
             borderRadius: 200,
             justifyContent: 'center',
             alignItems: 'center',
@@ -77,36 +104,8 @@ const Home = props => {
 
             elevation: 8,
           }}>
-          <Notepad2 size="35" color={AppColors.BLACK} />
+          <ArrowCircleRight2 size="35" color={AppColors.WHITE} />
         </TouchableOpacity>
-        <MapView
-          provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-          style={styles.map}
-          mapType={mapTypes} // haritanın tipi
-          initialRegion={{
-            latitude: 41.0541648,
-            longitude: 28.9764438,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-          region={{
-            latitude: 41.023845,
-            longitude: 29.1983273,
-            latitudeDelta: 0.0922, // Küçük değerler daha fazla zoom yapar
-            longitudeDelta: 0.0421, // Küçük değerler daha fazla zoom yapar
-          }}>
-          {notes.map((marker, index) => (
-            <Marker
-              key={index}
-              coordinate={marker.region}
-              title={marker.title}
-              description={marker.description}>
-              <CustomMarker />
-            </Marker>
-          ))}
-        </MapView>
-
-        <FlatActionButton {...props} />
       </View>
     </SafeAreaView>
   );
@@ -127,4 +126,4 @@ const styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default Home;
+export default SelectCoordinate;

@@ -3,3 +3,4 @@ export const NOTELIST = 'Not Listesi';
 export const ADDNOTE = 'Not Ekleme';
 export const EDITNOTE = 'Not Düzenleme';
 export const NOTEDETAIL = 'Not Detayı';
+export const SELECTCOORDINATE = 'Konum Seç';

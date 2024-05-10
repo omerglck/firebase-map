@@ -2,14 +2,14 @@
 import {NoteAdd} from 'iconsax-react-native';
 import {TouchableOpacity} from 'react-native';
 import {AppColors} from '../../theme/appColors';
-import {ADDNOTE} from '../../utils/routes';
+import {ADDNOTE, SELECTCOORDINATE} from '../../utils/routes';
 
 // create a component
 const FlatActionButton = props => {
   const {navigation} = props;
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate(ADDNOTE)}
+      onPress={() => navigation.navigate(SELECTCOORDINATE)}
       style={{
         width: 80,
         height: 80,
