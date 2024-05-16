@@ -1,21 +1,70 @@
 //import liraries
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, FlatList, SafeAreaView} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  SafeAreaView,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import {AppColors} from '../../theme/appColors';
 import NoteCard from '../../components/notes/noteCard';
 import FlatActionButton from '../../components/ui/flatActionButton';
 import {notes} from '../../utils/mockData';
+import LoadingModal from '../../components/loading';
 
 // create a component
 const NoteList = props => {
+  const [notes, setNotes] = useState([]);
+  const [visible, setVisible] = useState(false);
+
+  const getNotes = async () => {
+    setVisible(true);
+    firestore()
+      .collection('Notes')
+      .get()
+      .then(querySnapshot => {
+        const fetchedNotes = [];
+        querySnapshot.forEach(documentSnapshot => {
+          fetchedNotes.push({
+            title: documentSnapshot.data().title,
+            description: documentSnapshot.data().description,
+            id: documentSnapshot.id,
+            region: documentSnapshot.data().region,
+          });
+        });
+        setNotes(fetchedNotes);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+      .finally(() => {
+        setVisible(false);
+      });
+  };
+  useEffect(() => {
+    getNotes();
+  }, []);
   return (
     <SafeAreaView style={{flex: 1}}>
+      <LoadingModal visible={visible} />
+
       <View style={styles.container}>
-        <FlatList
-          data={notes}
-          renderItem={({item}) => <NoteCard item={item} />}
-          keyExtractor={item => item.id}
-        />
+        {visible ? (
+          <ActivityIndicator size={'large'} color={AppColors.BLUE} />
+        ) : (
+          <FlatList
+            refreshControl={
+              <RefreshControl refreshing={visible} onRefresh={getNotes} />
+            }
+            data={notes}
+            renderItem={({item}) => <NoteCard item={item} />}
+            keyExtractor={(item, index) => index}
+          />
+        )}
         <FlatActionButton {...props} />
       </View>
     </SafeAreaView>

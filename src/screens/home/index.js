@@ -1,6 +1,7 @@
 //import liraries
-import React, {Component, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {Component, useEffect, useState} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
 import {AppColors} from '../../theme/appColors';
 import {AddCircle, Map, NoteAdd, Notepad2} from 'iconsax-react-native';
@@ -9,12 +10,14 @@ import FlatActionButton from '../../components/ui/flatActionButton';
 import {ADDNOTE, NOTELIST} from '../../utils/routes';
 import {notes} from '../../utils/mockData';
 import CustomMarker from '../../components/maps/customMarker';
+import LoadingModal from '../../components/loading';
 
 // create a component
 const Home = props => {
   const {navigation} = props;
   const [mapTypes, setMapTypes] = useState('standart');
-
+  const [notes, setNotes] = useState([]);
+  const [visible, setVisible] = useState(false);
   const changeMapType = () => {
     if (mapTypes == 'standart') {
       setMapTypes('hybrid');
@@ -22,8 +25,33 @@ const Home = props => {
       setMapTypes('standart');
     }
   };
+  const getNotes = async () => {
+    setVisible(true);
+    firestore()
+      .collection('Notes')
+      .get()
+      .then(querySnapshot => {
+        const fetchedNotes = [];
+        querySnapshot.forEach(documentSnapshot => {
+          fetchedNotes.push(documentSnapshot.data());
+        });
+        setNotes(fetchedNotes);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+      .finally(() => {
+        setVisible(false);
+      });
+  };
+  useEffect(() => {
+    getNotes();
+  }, []);
+  console.log('state içerisindeki notlar', notes);
+
   return (
     <SafeAreaView style={{flex: 1}}>
+      <LoadingModal visible={visible} />
       <View style={styles.container}>
         <TouchableOpacity
           onPress={() => changeMapType()}

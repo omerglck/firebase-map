@@ -2,12 +2,13 @@
 import {Location} from 'iconsax-react-native';
 import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {AppColors} from '../../theme/appColors';
 
 // create a component
 const CustomMarker = () => {
   return (
     <View style={styles.container}>
-      <Location size="100" color="#37d67a" variant="Bold" />
+      <Location size="50" color={AppColors.RED} variant="Bold" />
     </View>
   );
 };

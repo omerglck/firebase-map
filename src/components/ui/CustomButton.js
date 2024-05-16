@@ -1,27 +1,37 @@
 //import liraries
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import {AppColors} from '../../theme/appColors';
 
 // create a component
 const CustomButton = props => {
-  const {title, disabled} = props; // isimler aynı olunca ... nokta ile hepsini verebiliriz
+  const {title, disabled, loading, color = AppColors.GREEN} = props; // isimler aynı olunca ... nokta ile hepsini verebiliriz
   return (
     <TouchableOpacity
       {...props}
       style={[
         styles.container,
-        {backgroundColor: disabled ? AppColors.GRAY : AppColors.GREEN},
+        {backgroundColor: disabled ? AppColors.GRAY : color},
       ]}>
-      <Text
-        style={{
-          color: AppColors.WHITE,
-          fontSize: 20,
-          textAlign: 'center',
-          fontWeight: '500',
-        }}>
-        {title}
-      </Text>
+      {loading ? (
+        <ActivityIndicator size={'small'} color={AppColors.WHITE} />
+      ) : (
+        <Text
+          style={{
+            color: AppColors.WHITE,
+            fontSize: 20,
+            textAlign: 'center',
+            fontWeight: '500',
+          }}>
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

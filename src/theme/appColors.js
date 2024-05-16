@@ -5,4 +5,5 @@ export const AppColors = {
   NOTE: '#FFECD6',
   GRAY: '#435585',
   GREEN: '#37d67a',
+  RED: 'red',
 };
